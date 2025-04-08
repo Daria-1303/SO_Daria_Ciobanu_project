@@ -144,6 +144,53 @@ void list_treasure(const char *hunt_id){
 
 }
 
+void view(const char *hunt_id, const char *id){
+    char *file_name = build_path(hunt_id);
+
+    int file = open(file_name, O_RDONLY);
+
+    if(file == -1){
+        perror("Error opening file");
+        return;
+    }
+
+    Treasure_T treasure;
+
+    ssize_t bytes_read;
+
+    while((bytes_read = read(file, &treasure, sizeof(treasure))) > 0){
+        // if the number of bytes read is not equal to the size of the struct, there is an error
+        if(bytes_read != sizeof(treasure)){
+            printf("Error reading file\n");
+            close(file);
+            return;
+        }
+
+        if(strcmp(treasure.id, id) == 0){
+            printf("ID: %s\n", treasure.id);
+            printf("Username: %s\n", treasure.userName);
+            printf("Latitude: %f\n", treasure.GPSCoordinate.latitude);
+            printf("Longitude: %f\n", treasure.GPSCoordinate.longitude);
+            printf("Clue text: %s\n", treasure.clueText);
+            printf("Value: %d\n", treasure.value);
+            break;
+        }
+    }
+
+    if(bytes_read == -1){
+        perror("Error reading file");
+        close(file);
+        return;
+    }
+
+    if(close(file) == -1){
+        perror("Error closing file");
+        return;
+    }
+
+    printf("Treasure viewed successfully!\n");
+}
+
 // will be used like : ./treasure_manager argv1(--add ) argv2(hunt_id) [argv3 -> id ->name]
 int main(int argc, char **argv){
     if(argc < 3){
@@ -158,7 +205,7 @@ int main(int argc, char **argv){
         list_treasure(argv[2]);
     }
     else if(strcmp(argv[1], "--view") == 0){
-        // view_treasure(argv[2], argv[3]);
+        view(argv[2], argv[3]);
     }
     else if(strcmp(argv[1], "--remove_treasure") == 0){
         // remove_treasure(argv[2], argv[3]);
@@ -170,8 +217,5 @@ int main(int argc, char **argv){
         printf("Invalid command\n");
         return 1;
     }
-
-
-
     return 0;
 }
