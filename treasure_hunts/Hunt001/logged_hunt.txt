@@ -1,2 +1,4 @@
-Added treasure with ID: 31 - user: xx1
-Treasure with ID 31 was removed. There were no more treasures in hunt Hunt001 so the empty file(treasure.bin) was deleted
+Added treasure with ID: 1 - user: daria
+Added treasure with ID: 2 - user: vlad
+Listed all treasures in hunt Hunt001
+Listed all treasures in hunt Hunt001

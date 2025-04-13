@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -55,4 +54,4 @@ void view(const char *hunt_id, const char *id);
 void remove_treasure(const char *hunt_id, const char *id);
 void remove_hunt(const char *hunt_id);
 
-#endif // __TREASURE_H__
+#endif 

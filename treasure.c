@@ -4,36 +4,46 @@
 // helper functions
 
 Treasure_T *create_treasure(){
-    Treasure_T *treasure = malloc(sizeof(Treasure_T));
-    if(treasure == NULL){
+    Treasure_T *treasure_to_be_added = malloc(sizeof(Treasure_T));
+
+    if(treasure_to_be_added == NULL){
         perror("Error allocating memory");
         return NULL;
     }
 
     printf("Enter treasure data: \n");
 
-    printf("ID: ");
-    scanf("%15s", treasure->id);
+    printf("ID (max %d chars): ", MAX_ID_LEN-1);
 
-    printf("Username: ");
-    scanf("%31s", treasure->userName);
+    if (scanf("%15s", treasure_to_be_added->id) != 1) {
+        free(treasure_to_be_added);
+        return NULL;
+    }
+
+
+    printf("Username (max %d chars): ", MAX_USERNAME_LEN-1);
+
+    if (scanf("%31s", treasure_to_be_added->userName) != 1) {
+        free(treasure_to_be_added);
+        return NULL;
+    }
 
     printf("Latitude: ");
-    scanf("%f", &treasure->GPSCoordinate.latitude);
+    scanf("%f", &treasure_to_be_added->GPSCoordinate.latitude);
 
     printf("Longitude: ");
-    scanf("%f", &treasure->GPSCoordinate.longitude);
+    scanf("%f", &treasure_to_be_added->GPSCoordinate.longitude);
     printf("Clue text: ");
 
     getchar(); 
-    fgets(treasure->clueText, MAX_CLUETEXT_LEN, stdin);
-    treasure->clueText[strcspn(treasure->clueText, "\n")] = 0;
+    fgets(treasure_to_be_added->clueText, MAX_CLUETEXT_LEN, stdin);
+    treasure_to_be_added->clueText[strcspn(treasure_to_be_added->clueText, "\n")] = 0;
 
     printf("Value: ");
-    scanf("%d", &treasure->value);
+    scanf("%d", &treasure_to_be_added->value);
 
 
-    return treasure;
+    return treasure_to_be_added;
 }
 
 int DIR_exists(const char *dir_path){
@@ -49,8 +59,14 @@ int DIR_exists(const char *dir_path){
 }
 
 int DIR_create(const char *dir_path) {
-    if (DIR_exists(dir_path)) return 0;
-    if (mkdir(dir_path, 0755) == -1) return -1;
+    if (DIR_exists(dir_path)) {
+        return 0;
+    }
+
+    if (mkdir(dir_path, 0755) == -1){
+        return -1;
+    } 
+    
     return 1;
 }
 
@@ -70,13 +86,19 @@ int symlink_create(const char *hunt_id){
     char target_path[MAX_PATH_LEN_DIR];
     snprintf(target_path, sizeof(target_path), "%s/%s/%s", TREASURE_DIR, hunt_id, TREASURE_LOG);
 
-    // link name -> the name of the symlink
     char link_name[MAX_PATH_LEN_DIR];
     snprintf(link_name, sizeof(link_name), "%s-%s", TREASURE_SYMLINK, hunt_id);
 
-    if(access(link_name, F_OK) == 0){
-        printf("Symlink already exists\n");
-        return 0;
+    struct stat sb;
+
+    if (lstat(link_name, &sb) == 0) {
+        if (S_ISLNK(sb.st_mode)) {
+            printf("Symlink already exists: %s\n", link_name);
+            return 0;
+        } else {
+            printf("%s is not a symlink!\n", link_name);
+            return -1;
+        }
     }
 
     if(symlink(target_path, link_name) == -1){
@@ -92,7 +114,6 @@ int symlink_create(const char *hunt_id){
 
 // operations
 
-// creates a directory for a new hunt, if already exists, just add to it the treasure
 void add_treasure(const char *hunt_id){
 
     static char dir_path[MAX_PATH_LEN_DIR];
@@ -121,14 +142,14 @@ void add_treasure(const char *hunt_id){
     }
 
     
-    // create the file
+    // create the file for the new treasure
     int file = FILE_create(file_path);
 
     if(file == -1){
         return;
     }
 
-    // create the log file
+    // create the log file for the HUNT
 
     int log_file = FILE_create(log_path);
 
@@ -137,7 +158,7 @@ void add_treasure(const char *hunt_id){
         return;
     }
 
-    // create the symlink
+    // create the symlink for the HUNT
 
     if(symlink_create(hunt_id) == -1){
         close(file);
@@ -196,7 +217,7 @@ void list_treasure(const char *hunt_id){
         return;
     }
 
-    printf("Hunt ID: %s\n", hunt_id);
+    printf("Hunt name: %s\n\n", hunt_id);
 
     struct stat file_stat;
     if(stat(file_path, &file_stat) == -1){
@@ -204,8 +225,9 @@ void list_treasure(const char *hunt_id){
         return;
     }
 
-    printf("File size: %ld bytes\n", file_stat.st_size);
-    printf("Last modification time: %ld\n", file_stat.st_mtime);
+    printf("File size: %ld bytes\n\n", file_stat.st_size);
+
+    printf("Last modification time: %ld\n\n", file_stat.st_mtime);
 
     int file = open(file_path, O_RDONLY);
 
@@ -294,8 +316,6 @@ void view(const char *hunt_id, const char *id){
         close(file);
         return;
     }
-
-
 
     Treasure_T treasure;
 
@@ -452,22 +472,22 @@ void remove_treasure(const char *hunt_id, const char *id) {
             return;
         }
 
-        // Remove the symlink if it exists
-        char symlink_path[MAX_PATH_LEN_FILE];
-        snprintf(symlink_path, sizeof(symlink_path), "%s-%s", TREASURE_SYMLINK, hunt_id);
+        // // Remove the symlink if it exists
+        // char symlink_path[MAX_PATH_LEN_FILE];
+        // snprintf(symlink_path, sizeof(symlink_path), "%s-%s", TREASURE_SYMLINK, hunt_id);
 
-        struct stat sb;
+        // struct stat sb;
 
-        if (lstat(symlink_path, &sb) == 0) {
-            if (S_ISLNK(sb.st_mode)) {
-                // E un symlink
-                unlink(symlink_path);
-            } else {
-                printf("%s is not a symlink!\n", symlink_path);
-            }
-        } else {
-            printf("Symlink %s does not exist\n", symlink_path);
-        }
+        // if (lstat(symlink_path, &sb) == 0) {
+        //     if (S_ISLNK(sb.st_mode)) {
+        //         // E un symlink
+        //         unlink(symlink_path);
+        //     } else {
+        //         printf("%s is not a symlink!\n", symlink_path);
+        //     }
+        // } else {
+        //     printf("Symlink %s does not exist\n", symlink_path);
+        // }
 
         
         //printf("All treasures removed. Deleted empty hunt file.\n");
@@ -527,15 +547,12 @@ void remove_hunt(const char *hunt_id){
         }
     }
 
-    // remove the hunt symlink if it exists
-
     char symlink_path[MAX_PATH_LEN_FILE];
     snprintf(symlink_path, sizeof(symlink_path), "%s-%s", TREASURE_SYMLINK, hunt_id);
 
     struct stat sb;
     if (lstat(symlink_path, &sb) == 0) {
         if (S_ISLNK(sb.st_mode)) {
-            // E un symlink
             unlink(symlink_path);
         } else {
             printf("%s is not a symlink!\n", symlink_path);
@@ -553,5 +570,4 @@ void remove_hunt(const char *hunt_id){
         return;
     }
     printf("Hunt removed successfully!\n");
-
 }
