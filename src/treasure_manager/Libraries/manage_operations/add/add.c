@@ -1,7 +1,7 @@
 #include "add.h"
 
 
-Operation_ERROR_T add_treasure(const char *hunt_id){
+void add_treasure(const char *hunt_id){
     static char dir_path[MAX_PATH_LEN_DIR];
     snprintf(dir_path, sizeof(dir_path), "%s/%s", TREASURE_DIR, hunt_id);
 
@@ -14,14 +14,14 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     if(!DIR_exists(TREASURE_DIR)) {
         if (DIR_create(TREASURE_DIR) == -1) {
             printf("Failed to create base directory");
-            return DIR_CREATE_ERROR;
+            return;
         }
     }
 
     if (!DIR_exists(dir_path)) {
         if (DIR_create(dir_path) == -1) {
             printf("Failed to create base directory");
-            return DIR_CREATE_ERROR;
+            return;
         }
     }
 
@@ -29,7 +29,7 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     int file = FILE_create(file_path);
 
     if(file == -1){
-        return FILE_CREATE_ERROR;
+        return;
     }
 
     // create the log file for the HUNT
@@ -37,7 +37,7 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
 
     if(log_file == -1){
         close(file);
-        return FILE_CREATE_ERROR;
+        return;
     }
 
     // create the symlink for the HUNT
@@ -45,7 +45,7 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     if(symlink_create(hunt_id) == -1){
         close(file);
         close(log_file);
-        return FILE_CREATE_ERROR;
+        return;
     }
 
     // read the data for the new treasure
@@ -54,7 +54,7 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     if(treasure_to_be_added == NULL){
         close(file);
         close(log_file);
-        return OPERATION_ERROR;
+        return;
     }
 
     // write the data to the file
@@ -64,14 +64,14 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
         printf("Error writing to file");
         close(file);
         close(log_file);
-        return OPERATION_ERROR;
+        return;
     }
 
     // close the file
     if(close(file) == -1){
         printf("Error closing file");
         close(log_file);
-        return OPERATION_ERROR;
+        return;
     }
 
     // write the log entry
@@ -83,17 +83,16 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     if(bytes_written_log == -1 || bytes_written_log != strlen(log_entry)){
         printf("Error writing to log file");
         close(log_file);
-        return OPERATION_ERROR;
+        return;
     }
 
     // close the log file
     if(close(log_file) == -1){
         printf("Error closing log file");
-        return OPERATION_ERROR;
+        return;
     }
 
     // free the memory allocated for the treasure
     free(treasure_to_be_added);
     //printf("Log entry added successfully!\n");
-    return NO_ERROR;
 }

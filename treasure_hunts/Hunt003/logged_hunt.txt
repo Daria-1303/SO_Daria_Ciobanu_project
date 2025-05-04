@@ -1,0 +1,2 @@
+Added treasure with ID daria to hunt Hunt003
+Listed all treasures in hunt Hunt003

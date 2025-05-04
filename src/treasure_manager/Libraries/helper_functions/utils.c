@@ -51,24 +51,27 @@ Operation_ERROR_T DIR_exists(const char *dir_path){
     DIR *dir = opendir(dir_path);
 
     if(!dir){
-        return OPERATION_FAILED;   // directory does not exist
+        return 0;   // directory does not exist
     }
+    // printf("Directory exists: %s\n", dir_path);
 
     closedir(dir);
 
-    return NO_ERROR;   // directory exists
+    return 1;   // directory exists
 }
 
 Operation_ERROR_T DIR_create(const char *dir_path) {
     if (DIR_exists(dir_path)) {
-        return NO_ERROR; // Directory already exists
+        return 0; // Directory already exists
     }
 
     if (mkdir(dir_path, 0755) == -1){
-        return OPERATION_FAILED; // Failed to create directory
+        return -1; // Failed to create directory
     } 
+
+    printf("Directory created successfully: %s\n", dir_path);
     
-    return NO_ERROR; // Directory created successfully
+    return 1; // Directory created successfully
 }
 
 // FILES
@@ -77,6 +80,7 @@ int FILE_create(const char *file_path) {
     int file = open(file_path, CREATE_FILE, 0644);
 
     if(file == -1){
+        perror(file_path);
         printf("Error opening/appending file");
         return -1;
     }

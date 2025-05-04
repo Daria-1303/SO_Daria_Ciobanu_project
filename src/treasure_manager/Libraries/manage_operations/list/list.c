@@ -1,6 +1,6 @@
 #include "list.h"
 
-Operation_ERROR_T list_treasure(const char *hunt_id){
+void list_treasure(const char *hunt_id){
     static char dir_path[MAX_PATH_LEN_DIR];
     snprintf(dir_path, sizeof(dir_path), "%s/%s", TREASURE_DIR, hunt_id);
 
@@ -12,7 +12,7 @@ Operation_ERROR_T list_treasure(const char *hunt_id){
 
     if (!DIR_exists(dir_path)) {
         printf("Hunt directory does not exist\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     printf("Hunt name: %s\n\n", hunt_id);
@@ -20,25 +20,40 @@ Operation_ERROR_T list_treasure(const char *hunt_id){
     struct stat file_stat;
     if(stat(file_path, &file_stat) == -1){
         printf("Error getting file status\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     printf("File size: %ld bytes\n", file_stat.st_size);
 
-    printf("Last modification time: %ld\n", file_stat.st_mtime);
+    time_t last_mod_time = file_stat.st_mtime;
+
+    if(last_mod_time == 0){
+        printf("File has not been modified\n");
+        return ;
+    }
+    else{
+        char *time_str = ctime(&last_mod_time);
+        if(time_str == NULL){
+            printf("Error converting time to string\n");
+            return ;
+        }
+        printf("Last modification time: %s", time_str);
+    }
+
+    //printf("Last modification time: %ld\n", file_stat.st_mtime);
 
     int file = open(file_path, O_RDONLY);
 
     if(file == -1){
         printf("Error opening file\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     int log_file = FILE_create(log_path);
 
     if(log_file == -1){
         close(file);
-        return OPERATION_ERROR;
+        return ;
     }
 
     Treasure_T treasure;
@@ -50,7 +65,7 @@ Operation_ERROR_T list_treasure(const char *hunt_id){
         if(bytes_read != sizeof(treasure)){
             printf("Error reading file\n");
             close(file);
-            return OPERATION_ERROR;
+            return ;
         }
 
         printf("ID: %s\n", treasure.id);
@@ -64,7 +79,7 @@ Operation_ERROR_T list_treasure(const char *hunt_id){
 
     if(close(file) == -1){
         printf("Error closing file\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     char log_entry[MAX_PATH_LEN_FILE];
@@ -76,19 +91,18 @@ Operation_ERROR_T list_treasure(const char *hunt_id){
     if(bytes_written_log == -1 || bytes_written_log != strlen(log_entry)){
         printf("Error writing to log file\n");
         close(log_file);
-        return OPERATION_ERROR;
+        return ;
     }
 
     if(close(log_file) == -1){
         printf("Error closing log file\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     //printf("Log entry added successfully!\n");
-    return NO_ERROR;
 }
 
-Operation_ERROR_T view(const char *hunt_id, const char *id){
+void view(const char *hunt_id, const char *id){
     static char dir_path[MAX_PATH_LEN_DIR];
     snprintf(dir_path, sizeof(dir_path), "%s/%s", TREASURE_DIR, hunt_id);
 
@@ -100,21 +114,21 @@ Operation_ERROR_T view(const char *hunt_id, const char *id){
 
     if (!DIR_exists(dir_path)) {
         printf("Hunt directory does not exist\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     int file = open(file_path, O_RDONLY);
 
     if(file == -1){
         printf("Error opening file\n");
-        return OPERATION_ERROR;
+        return ;
     }
 
     int log_file = FILE_create(log_path);
 
     if(log_file == -1){
         close(file);
-        return OPERATION_ERROR;
+        return ;
     }
 
     Treasure_T treasure;
@@ -129,7 +143,7 @@ Operation_ERROR_T view(const char *hunt_id, const char *id){
         if(bytes_read != sizeof(treasure)){
             printf("Error reading file\n");
             close(file);
-            return OPERATION_ERROR;
+            return ;
         }
 
         if (strcmp(treasure.id, id) == 0) {
@@ -149,12 +163,12 @@ Operation_ERROR_T view(const char *hunt_id, const char *id){
     if (!found) {
         printf("Error: No treasure found with ID '%s'\n", id);
         close(file);
-        return OPERATION_ERROR;
+        return ;
     }
 
     if(close(file) == -1){
         perror("Error closing file");
-        return OPERATION_ERROR;
+        return ;
     }
 
     char log_entry[MAX_PATH_LEN_FILE];
@@ -166,14 +180,13 @@ Operation_ERROR_T view(const char *hunt_id, const char *id){
     if(bytes_written_log == -1 || bytes_written_log != strlen(log_entry)){
         printf("Error writing to log file");
         close(log_file);
-        return OPERATION_ERROR;
+        return ;
     }
 
     if(close(log_file) == -1){
         printf("Error closing log file");
-        return OPERATION_ERROR;
+        return ;
     }
 
     //printf("Log entry added successfully!\n");
-    return NO_ERROR;
 }

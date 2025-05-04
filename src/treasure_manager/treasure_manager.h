@@ -13,6 +13,8 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
+
 
 // ---------------------------------------
 // Defines
@@ -64,10 +66,8 @@ typedef enum {
 
 typedef enum{
     NO_ERROR,
-    OPERATION_ERROR,
     OPERATION_FAILED,
-    FILE_CREATE_ERROR,
-    DIR_CREATE_ERROR
+    OPERATION_ERROR
 }Operation_ERROR_T;
 
 #endif 
