@@ -95,5 +95,5 @@ Operation_ERROR_T add_treasure(const char *hunt_id){
     // free the memory allocated for the treasure
     free(treasure_to_be_added);
     //printf("Log entry added successfully!\n");
-
+    return NO_ERROR;
 }

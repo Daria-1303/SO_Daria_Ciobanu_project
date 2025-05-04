@@ -19,11 +19,6 @@ build:
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(BIN_TREASURE_MANAGER) $(SRC_treasure_manager) $(SRC_MANAGER)
 	@echo "Build complete."
 
-run:
-	@echo "Running project..."
-	./$(BIN_DIR)/$(BIN_TREASURE_MANAGER) 
-	@echo "Run complete."
-
 clean:
 	@echo "Cleaning project..."
 	rm -f $(BIN_DIR)/$(BIN_TREASURE_MANAGER)
