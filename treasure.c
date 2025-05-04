@@ -172,7 +172,7 @@ void add_treasure(const char *hunt_id){
 
     if(treasure_to_be_added == NULL){
         return;
-    }
+    }   
     
     // write the treasure data to the file
     ssize_t bytes_written = write(file, treasure_to_be_added, sizeof(Treasure_T));
