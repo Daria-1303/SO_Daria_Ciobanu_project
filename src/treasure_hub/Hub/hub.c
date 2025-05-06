@@ -14,52 +14,63 @@ int is_monitor_running(){
 }
 
 // 0 -> fail 1 -> success
-int start_monitor(){
-    // if the monitor is already running we'll return 0 -> fail
-    if(is_monitor_running()){
+int start_monitor() {
+    if (is_monitor_running()) {
         write(1, "Monitor is already running\n", 26);
         return 0;
     }
 
-    // fork a new process
-    hub_monitor.monitor_pid = fork();
-
-    if(hub_monitor.monitor_pid < 0){
-        write(1, "Failed to fork monitor process\n", 32);
+    pid_t pid = fork();
+    if (pid < 0) {
+        write(1, "Failed to fork monitor process\n", 31);
         return 0;
     }
 
-    if(hub_monitor.monitor_pid == 0){
-        // child process
-
-        char *args[] = {TREASURE_MONITOR_EXEC, NULL};
-
-        execv(TREASURE_MONITOR_EXEC, args);
-
-        // if execv fails
-        write(1, "Failed to exec monitor process\n", 32);
-        exit(1);
+    if (pid == 0) {
+        // Child process - the monitor
+        execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, NULL);
+        perror("execl failed");
+        exit(EXIT_FAILURE);
     }
 
-    // parent process
+    hub_monitor.monitor_pid = pid;
     hub_monitor.monitor_status = RUNNING;
-
-    return 1;    
+    return 1;
 }
 
 
 // 0 -> fail 1 -> success
-int stop_monitor(){
-    if (!is_monitor_running()) {    // 1-> monitor is running, 0 -> monitor is not running
-        write(1, "Monitor is not running.\n", 25);
+int stop_monitor() {
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
         return 0;
     }
 
+    pid_t old_pid = hub_monitor.monitor_pid;
     hub_monitor.monitor_status = SHUTTING_DOWN;
-    kill(hub_monitor.monitor_pid, SIGTERM);
-
-    write(1, "Sent termination signal to monitor.\n", 36);
-
+    
+    if (kill(old_pid, SIGTERM) == -1) {
+        perror("Failed to send SIGTERM");
+        return 0;
+    }
+    
+    // Wait for process to terminate
+    int status;
+    pid_t result = waitpid(old_pid, &status, WNOHANG);
+    
+    if (result == -1) {
+        perror("waitpid failed");
+        return 0;
+    }
+    
+    if (result == old_pid) {    
+        hub_monitor.monitor_pid = -1;
+        hub_monitor.monitor_status = OFF;
+        write(1, "Monitor stopped successfully.\n", 29);
+        return 1;
+    }
+    
+    write(1, "Monitor is shutting down...\n", 28);
     return 1;
 }
 
