@@ -6,6 +6,19 @@
 
 Hub_Monitor_T hub_monitor = {-1, OFF};
 
+void send_command_to_monitor(const char *command) {
+    int fd = open("monitor_command.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0) {
+        perror("open command file");
+        return;
+    }
+
+    write(fd, command, strlen(command));
+    close(fd);
+
+    kill(hub_monitor.monitor_pid, SIGUSR1);
+}
+
 int is_monitor_running(){
     if(hub_monitor.monitor_pid > 0 && hub_monitor.monitor_status == RUNNING){
         return 1;
@@ -74,19 +87,35 @@ int stop_monitor() {
     return 1;
 }
 
-void send_command_to_monitor(const char *command) {
-    int fd = open("monitor_command.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd < 0) {
-        perror("open command file");
-        return;
+int list_hunts(){
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
+        return 0;
     }
 
-    write(fd, command, strlen(command));
-    close(fd);
-
-    kill(hub_monitor.monitor_pid, SIGUSR1);
+    send_command_to_monitor("list_hunts");
+    return 1;
 }
 
+int list_treasures(){
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
+        return 0;
+    }
+
+    send_command_to_monitor("list_treasures");
+    return 1;
+}
+
+int view_treasure(){
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
+        return 0;
+    }
+
+    send_command_to_monitor("view_treasure");
+    return 1;
+}
 
 
 void on_sigchld(int signo){

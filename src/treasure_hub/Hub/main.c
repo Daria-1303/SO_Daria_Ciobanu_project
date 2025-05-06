@@ -75,13 +75,13 @@ int main(void){
                 stop_monitor();
                 break;
             case LIST_HUNTS:
+                list_hunts();
+                break;
             case LIST_TREASURES:
+                list_treasures();
+                break;
             case VIEW_TREASURE:
-                if (!is_monitor_running()) {
-                    write(1, "Monitor is not running. Cannot process command.\n", 49);
-                } else {
-                    send_command_to_monitor(command);
-                }
+                view_treasure();
                 break;
             case HELP:
                 print_help();
