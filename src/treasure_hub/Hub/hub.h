@@ -24,20 +24,22 @@
 #define TREASURE_MANAGER_EXEC  "bin/treasure_manager"
 #define TREASURE_MONITOR_EXEC  "bin/treasure_monitor"
 
+#define BUFFER_SIZE 256
+
 // ---------------------------------------------------------
 // Structures
 // ---------------------------------------------------------
 
 typedef enum{
     INVALID_OPERATION,
-    CLEAR,
-    HELP,
     EXIT,
     START_MONITOR,
     STOP_MONITOR,
     LIST_HUNTS,
     LIST_TREASURES,
     VIEW_TREASURE,
+    HELP,
+    CLEAR
 }Hub_Command_T;
 
 typedef enum{
@@ -49,13 +51,22 @@ typedef enum{
 typedef struct{
     pid_t monitor_pid;
     Status_t monitor_status;
-    int monitor_fd;
 }Hub_Monitor_T;
 
 // ---------------------------------------------------------
-// external functions
+// functions
 // ---------------------------------------------------------
 
+int start_monitor(void);
+int stop_monitor(void);
+
+// -------------------------------------------------
+// utils
+// -------------------------------------------------
+
+void handle_sigchld();
+void send_command_to_monitor(const char *command);
+int is_monitor_running(void);
 
 // ---------------------------------------------------------
 // extern variable
