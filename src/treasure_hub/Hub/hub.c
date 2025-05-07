@@ -33,20 +33,20 @@ int start_monitor() {
         return 0;
     }
 
-    pid_t pid = fork();
-    if (pid < 0) {
+    hub_monitor.monitor_pid = fork();
+    if (hub_monitor.monitor_pid < 0) {
         write(1, "Failed to fork monitor process\n", 31);
         return 0;
     }
 
-    if (pid == 0) {
+    if (hub_monitor.monitor_pid == 0) {
         // Child process - the monitor
         execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, NULL);
         perror("execl failed");
         exit(EXIT_FAILURE);
     }
 
-    hub_monitor.monitor_pid = pid;
+    //hub_monitor.monitor_pid = pid;
     hub_monitor.monitor_status = RUNNING;
     return 1;
 }
@@ -59,7 +59,9 @@ int stop_monitor() {
         return 0;
     }
 
-    pid_t old_pid = hub_monitor.monitor_pid;
+    send_command_to_monitor("stop");
+
+    /*pid_t old_pid = hub_monitor.monitor_pid;
     hub_monitor.monitor_status = SHUTTING_DOWN;
     
     if (kill(old_pid, SIGTERM) == -1) {
@@ -81,7 +83,7 @@ int stop_monitor() {
         hub_monitor.monitor_status = OFF;
         write(1, "Monitor stopped successfully.\n", 29);
         return 1;
-    }
+	}*/
     
     write(1, "Monitor is shutting down...\n", 28);
     return 1;
@@ -97,38 +99,39 @@ int list_hunts(){
     return 1;
 }
 
-int list_treasures(){
+int list_treasures(char *input){
     if (!is_monitor_running()) {
         write(1, "Monitor is not running.\n", 24);
         return 0;
     }
 
-    send_command_to_monitor("list_treasures");
+    char *hunt_id = input + 15;
+    char command[BUFFER_SIZE];
+    snprintf(command, sizeof(command), "list_treasures %s", hunt_id);
+    send_command_to_monitor(command);
     return 1;
 }
 
-int view_treasure(){
+int view_treasure(char *input){
     if (!is_monitor_running()) {
         write(1, "Monitor is not running.\n", 24);
         return 0;
     }
 
-    send_command_to_monitor("view_treasure");
+    char command[BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s", input);
+    send_command_to_monitor(command);
     return 1;
 }
 
 
 void on_sigchld(int signo){
-    int saved_errno = errno;
-    pid_t pid;
-    while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
-        if (pid == hub_monitor.monitor_pid) {
-            hub_monitor.monitor_status = OFF;
-            hub_monitor.monitor_pid = -1;
-            write(1, "Monitor has terminated.\n", 25);
-        }
+    int status;
+    pid_t pid = wait(&status);
+    if (pid == hub_monitor.monitor_pid) {
+      printf("Monitor exited with status %d\n", WEXITSTATUS(status));
+      hub_monitor.monitor_status = OFF;
     }
-    errno = saved_errno;
 }
 
 void handle_sigchld(){

@@ -1,3 +1,8 @@
 Added treasure with ID daria to hunt Hunt003
 Listed all treasures in hunt Hunt003
 Listed all treasures in hunt Hunt003
+Listed all treasures in hunt Hunt003
+Viewed treasure with ID daria, user 131 in hunt Hunt003
+Listed all treasures in hunt Hunt003
+Listed all treasures in hunt Hunt003
+Viewed treasure with ID daria, user 131 in hunt Hunt003

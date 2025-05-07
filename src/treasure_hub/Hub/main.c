@@ -28,10 +28,10 @@ static Hub_Command_T get_command(char *command){
     else if(strcmp(command, "list_hunts") == 0){
         return LIST_HUNTS;
     } 
-    else if(strcmp(command, "list_treasures") == 0){
+    else if(strncmp(command, "list_treasures ", 15) == 0){
         return LIST_TREASURES;
     } 
-    else if(strcmp(command, "view_treasure") == 0){
+    else if(strncmp(command, "view_treasure ", 14) == 0){
         return VIEW_TREASURE;
     } 
     else if(strcmp(command, "help") == 0){
@@ -78,10 +78,10 @@ int main(void){
                 list_hunts();
                 break;
             case LIST_TREASURES:
-                list_treasures();
+                list_treasures(command);
                 break;
             case VIEW_TREASURE:
-                view_treasure();
+                view_treasure(command);
                 break;
             case HELP:
                 print_help();

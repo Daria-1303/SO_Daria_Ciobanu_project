@@ -60,8 +60,8 @@ typedef struct{
 int start_monitor(void);
 int stop_monitor(void);
 int list_hunts(void);
-int list_treasures(void);
-int view_treasure(void);
+int list_treasures(char*);
+int view_treasure(char*);
 
 
 
