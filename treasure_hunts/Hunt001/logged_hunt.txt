@@ -1,4 +1,0 @@
-Added treasure with ID: 1 - user: daria
-Added treasure with ID: 2 - user: vlad
-Listed all treasures in hunt Hunt001
-Listed all treasures in hunt Hunt001
