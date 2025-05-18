@@ -35,7 +35,7 @@ void exec_calculate_score(char *hunt_id){
 
     if(pid == 0){
         execl(TREASURE_CALCULATOR_EXEC, TREASURE_CALCULATOR_EXEC, hunt_id, NULL);
-        write(2, "Error executing calculate score\n", 34);
+        write(2, "Error executing calculate score\n", 33);
         exit(1);
     }
 

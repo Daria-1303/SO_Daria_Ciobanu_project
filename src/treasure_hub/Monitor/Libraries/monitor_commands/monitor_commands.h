@@ -20,7 +20,7 @@
 
 void exec_treasure_manager(char *command, char *hunt_id, char *treasure_id);
 
-void exec_calculate_score(char *command, char *hunt_id);
+void exec_calculate_score(char *hunt_id);
 
 void process_command();
 

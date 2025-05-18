@@ -171,6 +171,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Print the name of the Hunt directory
+    printf("\n--------------\nHunt directory: %s\n---------------\n", hunt_id);
+    // Print the scores
     print_scores(scores);
     free_score_list(scores);
 

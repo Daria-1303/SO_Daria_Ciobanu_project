@@ -26,10 +26,10 @@ Hub_Command_T get_command_type(char *input){
         return LIST_TREASURES;
     } 
     else if(strncmp(input, "view_treasure ", 14) == 0){
-        return VIEW_TREASURE;
+        return VIEW_TREASURE_FROM_HUNT;
     } 
     else if(strcmp(input, "help") == 0){
-        return HELP;
+        return HELP_COMMAND;
     } 
     else if(strcmp(input, "clear") == 0){
         return CLEAR;
@@ -41,7 +41,7 @@ Hub_Command_T get_command_type(char *input){
         return CALCULATE_SCORE;
     }
     else {
-        return INVALID_OPERATION;
+        return INVALID_OPERATION_GAVE;
     }
 }
 
@@ -59,10 +59,10 @@ void execute_command(Hub_Command_T command, char *input){
         case LIST_TREASURES:
             list_treasures(input);
             break;
-        case VIEW_TREASURE:
+        case VIEW_TREASURE_FROM_HUNT:
             view_treasure(input);
             break;
-        case HELP:
+        case HELP_COMMAND:
             print_help();
             break;
         case CLEAR:

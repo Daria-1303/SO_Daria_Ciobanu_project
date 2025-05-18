@@ -20,4 +20,10 @@ void handle_sigchld() {
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
     
     sigaction(SIGCHLD, &sa, NULL);
+
+    // the end of a pipe
+    if(fd_for_pipe != -1) {
+        close(fd_for_pipe);
+        fd_for_pipe = -1;
+    }
 }
