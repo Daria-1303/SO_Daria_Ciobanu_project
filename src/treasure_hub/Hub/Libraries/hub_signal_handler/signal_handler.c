@@ -9,6 +9,12 @@ void on_sigchld(int signo) {
         hub_monitor.monitor_status = OFF;
     }
 
+    // the end of a pipe
+    if(fd_for_pipe != -1) {
+        close(fd_for_pipe);
+        fd_for_pipe = -1;
+    }
+
 }
 
 void handle_sigchld() {
@@ -21,9 +27,5 @@ void handle_sigchld() {
     
     sigaction(SIGCHLD, &sa, NULL);
 
-    // the end of a pipe
-    if(fd_for_pipe != -1) {
-        close(fd_for_pipe);
-        fd_for_pipe = -1;
-    }
+    
 }

@@ -78,7 +78,7 @@ int start_monitor(void){
         char write_fd[BUFFER_SIZE];
         sprintf(write_fd, "%d", pipefd[1]);
 
-        execlp(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, write_fd, NULL);
+        execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, write_fd, NULL);
 
         // this was modified for the phase 3
         //execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, NULL);

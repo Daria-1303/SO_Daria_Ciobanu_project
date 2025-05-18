@@ -1,1 +1,1 @@
-view_treasure Hunt001 Daria_Ciobanu
+list_hunts
