@@ -37,6 +37,9 @@ Hub_Command_T get_command_type(char *input){
     else if(strcmp(input, "exit") == 0){
         return EXIT;
     }
+    else if(strcmp(input, "calculate_score") == 0){
+        return CALCULATE_SCORE;
+    }
     else {
         return INVALID_OPERATION;
     }
@@ -72,6 +75,9 @@ void execute_command(Hub_Command_T command, char *input){
             else{
                 exit(0);
             }
+        case CALCULATE_SCORE:
+            calculate_score();
+            break;
         default:
             write(1, "Invalid command. Type 'help' for options.\n", 42);
         

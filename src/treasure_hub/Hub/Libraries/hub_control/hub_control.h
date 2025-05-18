@@ -31,4 +31,6 @@ int list_treasures(char* input);
 
 int view_treasure(char* input);
 
+int calculate_score();
+
 #endif

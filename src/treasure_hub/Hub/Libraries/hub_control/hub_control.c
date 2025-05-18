@@ -103,3 +103,13 @@ int view_treasure(char* input){
 
     return 1;
 }
+
+int calculate_score(){
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
+        return 0;
+    }
+
+    send_command_to_monitor("calculate_score");
+    return 1;
+}

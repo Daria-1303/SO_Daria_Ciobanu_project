@@ -39,7 +39,8 @@ typedef enum{
     LIST_TREASURES,
     VIEW_TREASURE,
     HELP,
-    CLEAR
+    CLEAR,
+    CALCULATE_SCORE 
 }Hub_Command_T;
 
 typedef enum{

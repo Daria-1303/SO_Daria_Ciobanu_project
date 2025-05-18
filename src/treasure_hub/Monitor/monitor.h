@@ -28,6 +28,9 @@
 // ---------------------------------------------------------
 
 #define TREASURE_MANAGER_EXEC  "bin/treasure_manager"
+#define TREASURE_CALCULATOR_EXEC  "bin/treasure_calculator"
+
+#define TREASURE_HUNTS_PATH "treasure_hunts"
 
 #define BUFFER_SIZE 1024
 
