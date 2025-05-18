@@ -1,14 +1,29 @@
 #include "monitor_commands.h"
 
 void exec_treasure_manager(char *command, char *hunt_id, char *treasure_id){
+    int pipe_fd[2];
+
+    if(pipe(pipe_fd) == -1){
+        dprintf(output_fd_pipe, "Error creating pipe\n");
+        return;
+    }
+
     pid_t pid = fork();
 
     if(pid < 0){
-        perror("Error forking");
+        write(2, "Error forking\n", 15);
         return;
     }
 
     if(pid == 0){
+        // close the read end of the pipe
+        close(pipe_fd[0]);
+        // redirect stdout to the write end of the pipe
+        dup2(pipe_fd[1], 1);
+
+        // close the write end of the pipe
+        close(pipe_fd[1]);
+
         if(treasure_id){
             execl(TREASURE_MANAGER_EXEC, TREASURE_MANAGER_EXEC, command, hunt_id, treasure_id, NULL);
             write(2, "Error executing treasure manager\n", 34);
@@ -22,10 +37,36 @@ void exec_treasure_manager(char *command, char *hunt_id, char *treasure_id){
     }
 
     // Parent process
+    // close the write end of the pipe
+    close(pipe_fd[1]);
+    // read the output from the read end of the pipe
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read;
+
+    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0){
+        // buffer[bytes_read] = '\0';
+        dprintf(output_fd_pipe, "%s", buffer);
+    }
+
+    if(bytes_read < 0){
+        dprintf(output_fd_pipe, "Error reading from pipe\n");
+    }
+
+    // close the read end of the pipe
+    close(pipe_fd[0]);
+
+    // wait for the child process to finish
     waitpid(pid, NULL, 0);
 }
 
 void exec_calculate_score(char *hunt_id){
+    int pipe_fd[2];
+
+    if(pipe(pipe_fd) == -1){
+        dprintf(output_fd_pipe, "Error creating pipe\n");
+        return;
+    }
+
     pid_t pid = fork();
 
     if(pid < 0){
@@ -34,12 +75,41 @@ void exec_calculate_score(char *hunt_id){
     }
 
     if(pid == 0){
+        // close the read end of the pipe
+        close(pipe_fd[0]);
+
+        // redirect stdout to the write end of the pipe
+        dup2(pipe_fd[1], 1);
+
+        // close the write end of the pipe
+        close(pipe_fd[1]);
+        // execute the calculator
         execl(TREASURE_CALCULATOR_EXEC, TREASURE_CALCULATOR_EXEC, hunt_id, NULL);
         write(2, "Error executing calculate score\n", 33);
         exit(1);
     }
 
     // Parent process
+
+    // close the write end of the pipe
+    close(pipe_fd[1]);
+
+    // read the output from the read end of the pipe
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read;
+    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0){
+        // buffer[bytes_read] = '\0';
+        dprintf(output_fd_pipe, "%s", buffer);
+    }
+
+    if(bytes_read < 0){
+        dprintf(output_fd_pipe, "Error reading from pipe\n");
+    }
+
+    // close the read end of the pipe
+    close(pipe_fd[0]);
+
+    // wait for the child process to finish
     waitpid(pid, NULL, 0);
 }
 
@@ -114,6 +184,6 @@ void process_command(){
         closedir(dir);      
     }
     else{
-        write(1, "Monitor invalid command\n", 25);
+        write(output_fd_pipe, "Monitor invalid command\n", 25);
     }
 }

@@ -24,7 +24,7 @@
 #define TREASURE_MANAGER_EXEC  "bin/treasure_manager"
 #define TREASURE_MONITOR_EXEC  "bin/treasure_monitor"
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 1024
 
 // ---------------------------------------------------------
 // Structures

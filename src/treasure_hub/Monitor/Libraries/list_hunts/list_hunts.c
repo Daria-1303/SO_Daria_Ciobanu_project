@@ -1,6 +1,6 @@
 #include "list_hunts.h"
 
-output_fd_pipe = 1;
+int output_fd_pipe = 1;
 
 void list_hunts() {
     DIR *dir = opendir(HUNTS_DIR_PATH);

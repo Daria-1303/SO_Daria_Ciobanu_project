@@ -32,7 +32,9 @@ void send_command_to_monitor(const char *command){
 
     if(len > 0) {
         buffer[len] = '\0';
-        write(1, buffer, len);
+        //write(1, buffer, len);
+        write(1, buffer, strlen(buffer));
+        
     } else {
         write(1, "No response from monitor\n", 25);
     }
@@ -76,7 +78,7 @@ int start_monitor(void){
         char write_fd[BUFFER_SIZE];
         sprintf(write_fd, "%d", pipefd[1]);
 
-        execlp(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, write_fd, NULL);
+        execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, write_fd, NULL);
 
         // this was modified for the phase 3
         //execl(TREASURE_MONITOR_EXEC, TREASURE_MONITOR_EXEC, NULL);
