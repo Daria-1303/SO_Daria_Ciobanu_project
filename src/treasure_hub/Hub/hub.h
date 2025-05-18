@@ -31,15 +31,16 @@
 // ---------------------------------------------------------
 
 typedef enum{
-    INVALID_OPERATION,
+    INVALID_OPERATION_GAVE,
     EXIT,
     START_MONITOR,
     STOP_MONITOR,
     LIST_HUNTS,
     LIST_TREASURES,
-    VIEW_TREASURE,
-    HELP,
-    CLEAR
+    VIEW_TREASURE_FROM_HUNT,
+    HELP_COMMAND,
+    CLEAR,
+    CALCULATE_SCORE 
 }Hub_Command_T;
 
 typedef enum{
@@ -58,5 +59,7 @@ typedef struct{
 // ---------------------------------------------------------
 
 extern Hub_Monitor_T hub_monitor;
+
+extern int fd_for_pipe;
 
 #endif

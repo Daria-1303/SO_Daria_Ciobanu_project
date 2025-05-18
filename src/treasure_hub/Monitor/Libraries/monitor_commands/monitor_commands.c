@@ -25,6 +25,23 @@ void exec_treasure_manager(char *command, char *hunt_id, char *treasure_id){
     waitpid(pid, NULL, 0);
 }
 
+void exec_calculate_score(char *hunt_id){
+    pid_t pid = fork();
+
+    if(pid < 0){
+        perror("Error forking");
+        return;
+    }
+
+    if(pid == 0){
+        execl(TREASURE_CALCULATOR_EXEC, TREASURE_CALCULATOR_EXEC, hunt_id, NULL);
+        write(2, "Error executing calculate score\n", 33);
+        exit(1);
+    }
+
+    // Parent process
+    waitpid(pid, NULL, 0);
+}
 
 void process_command(){
     char buffer[BUFFER_SIZE];
@@ -71,6 +88,30 @@ void process_command(){
         else{
             write(1, "Invalid format\n", 15);
         }
+    }
+    else if(strcmp(buffer, "calculate_score") == 0){
+        // the logic for finding every hunt of treasure_hunts folder
+        // and then exec the calculator
+        DIR *dir = opendir(TREASURE_HUNTS_PATH);
+
+        if(dir == NULL){
+            write(2, "Error opening directory\n", 22);
+            return;
+        }
+
+        struct dirent *entry;
+        while((entry = readdir(dir)) != NULL){
+            if(entry->d_type == DT_DIR){
+                // skip the . and .. directories
+                if(strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0){
+                    char hunt_id[10];
+                    strcpy(hunt_id, entry->d_name);
+                    exec_calculate_score(hunt_id);
+                }
+            }
+        }
+
+        closedir(dir);      
     }
     else{
         write(1, "Monitor invalid command\n", 25);

@@ -1,5 +1,7 @@
 #include "list_hunts.h"
 
+output_fd_pipe = 1;
+
 void list_hunts() {
     DIR *dir = opendir(HUNTS_DIR_PATH);
 
@@ -19,7 +21,7 @@ void list_hunts() {
             struct stat st;
             if (stat(path, &st) == 0) {
                 int count = st.st_size / sizeof(struct Treasure);
-                printf("Hunt: %s | Treaures: %d\n", entry->d_name, count);
+                dprintf(output_fd_pipe, "Hunt: %s | Treaures: %d\n", entry->d_name, count);
             }
         }
     }

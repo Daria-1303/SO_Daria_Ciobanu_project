@@ -2,6 +2,7 @@
 
 #include "Libraries/hub_commands/hub_commands.h"
 #include "Libraries/hub_signal_handler/signal_handler.h"
+#include "../Calculate_Score/calculate_score.h"
 
 int main(void){
     char command[BUFFER_SIZE];

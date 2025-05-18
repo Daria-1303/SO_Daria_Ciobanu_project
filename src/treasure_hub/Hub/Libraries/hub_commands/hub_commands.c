@@ -26,10 +26,10 @@ Hub_Command_T get_command_type(char *input){
         return LIST_TREASURES;
     } 
     else if(strncmp(input, "view_treasure ", 14) == 0){
-        return VIEW_TREASURE;
+        return VIEW_TREASURE_FROM_HUNT;
     } 
     else if(strcmp(input, "help") == 0){
-        return HELP;
+        return HELP_COMMAND;
     } 
     else if(strcmp(input, "clear") == 0){
         return CLEAR;
@@ -37,8 +37,11 @@ Hub_Command_T get_command_type(char *input){
     else if(strcmp(input, "exit") == 0){
         return EXIT;
     }
+    else if(strcmp(input, "calculate_score") == 0){
+        return CALCULATE_SCORE;
+    }
     else {
-        return INVALID_OPERATION;
+        return INVALID_OPERATION_GAVE;
     }
 }
 
@@ -56,10 +59,10 @@ void execute_command(Hub_Command_T command, char *input){
         case LIST_TREASURES:
             list_treasures(input);
             break;
-        case VIEW_TREASURE:
+        case VIEW_TREASURE_FROM_HUNT:
             view_treasure(input);
             break;
-        case HELP:
+        case HELP_COMMAND:
             print_help();
             break;
         case CLEAR:
@@ -72,6 +75,9 @@ void execute_command(Hub_Command_T command, char *input){
             else{
                 exit(0);
             }
+        case CALCULATE_SCORE:
+            calculate_score();
+            break;
         default:
             write(1, "Invalid command. Type 'help' for options.\n", 42);
         
