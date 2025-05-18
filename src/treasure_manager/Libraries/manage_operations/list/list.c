@@ -37,7 +37,7 @@ void list_treasure(const char *hunt_id){
             printf("Error converting time to string\n");
             return ;
         }
-        printf("Last modification time: %s", time_str);
+        printf("Last modification time: %s\n", time_str);
     }
 
     //printf("Last modification time: %ld\n", file_stat.st_mtime);

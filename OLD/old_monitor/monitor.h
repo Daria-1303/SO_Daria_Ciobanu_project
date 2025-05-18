@@ -1,5 +1,5 @@
-#ifndef __HUB_H__
-#define __HUB_H__
+#ifndef __MONITOR_H__
+#define __MONITOR_H__
 
 // ---------------------------------------------------------
 // Includes
@@ -17,46 +17,34 @@
 #include <time.h>
 #include <sys/wait.h>
 
+#include <dirent.h>
+#include <sys/stat.h>
+
 // ---------------------------------------------------------
 // Defines
 // ---------------------------------------------------------
 
 #define TREASURE_MANAGER_EXEC  "bin/treasure_manager"
-#define TREASURE_MONITOR_EXEC  "bin/treasure_monitor"
 
-#define BUFFER_SIZE 256
-
-// ---------------------------------------------------------
-// Structures
-// ---------------------------------------------------------
-
-typedef enum{
-    INVALID_OPERATION,
-    EXIT,
-    START_MONITOR,
-    STOP_MONITOR,
-    LIST_HUNTS,
-    LIST_TREASURES,
-    VIEW_TREASURE,
-    HELP,
-    CLEAR
-}Hub_Command_T;
-
-typedef enum{
-    OFF, 
-    RUNNING, 
-    SHUTTING_DOWN
-} Status_t;
-
-typedef struct{
-    pid_t monitor_pid;
-    Status_t monitor_status;
-}Hub_Monitor_T;
+#define BUFFER_SIZE 1024
 
 // ---------------------------------------------------------
-// extern variable
+// Global Variables
 // ---------------------------------------------------------
 
-extern Hub_Monitor_T hub_monitor;
+// global flag -> check if the program is running -> cleared when shutting down
+
+extern volatile sig_atomic_t is_running;
+
+
+// -----------------------------------------------------------
+// Functions
+// -----------------------------------------------------------
+
+void setup_signal_handlers();
+
+void process_command();
+
+
 
 #endif
