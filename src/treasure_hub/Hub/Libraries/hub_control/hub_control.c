@@ -32,7 +32,9 @@ void send_command_to_monitor(const char *command){
 
     if(len > 0) {
         buffer[len] = '\0';
-        write(1, buffer, len);
+        //write(1, buffer, len);
+        write(1, buffer, strlen(buffer));
+        
     } else {
         write(1, "No response from monitor\n", 25);
     }

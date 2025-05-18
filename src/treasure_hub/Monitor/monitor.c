@@ -18,7 +18,12 @@
 
 volatile sig_atomic_t is_running = 1;
 
-int main(void){
+int main(int argc, char **argv) {
+    // we set the output file 
+    if(argc >= 2){
+        output_fd_pipe = atoi(argv[1]);
+    }
+
     char message[BUFFER_SIZE];
 
     // setup signal handlers
