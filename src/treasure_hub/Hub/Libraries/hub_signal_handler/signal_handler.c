@@ -4,9 +4,15 @@ void on_sigchld(int signo) {
     int status;
     pid_t pid = wait(&status);
 
-    if (pid == hub_monitor.monitor_pid) {
-        printf("Monitor exited with status %d\n", WEXITSTATUS(status));
-        hub_monitor.monitor_status = OFF;
+    while((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+        if (pid == -1) {
+            break;
+        }
+
+        if (pid == hub_monitor.monitor_pid) {
+            printf("Monitor exited with status %d\n", WEXITSTATUS(status));
+            hub_monitor.monitor_status = OFF;
+        }
     }
 
     // the end of a pipe
@@ -24,6 +30,7 @@ void handle_sigchld() {
 
     sa.sa_handler = on_sigchld;
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+    
     
     sigaction(SIGCHLD, &sa, NULL);
 

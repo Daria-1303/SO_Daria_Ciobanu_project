@@ -11,12 +11,14 @@ int fd_for_pipe = -1;
 void send_command_to_monitor(const char *command){
     int fd = open(COMMAND_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
+    //perror("here\n");
     if (fd < 0) {
         perror("open command file");
         return;
     }
 
     write(fd, command, strlen(command));
+    // write(fd, "\n", 1); // Add a newline to indicate end of command
     close(fd);
 
     kill(hub_monitor.monitor_pid, SIGUSR1);
@@ -103,9 +105,18 @@ int stop_monitor(void){
         return 0;
     }
 
-    send_command_to_monitor("stop_monitor");
+    //send_command_to_monitor("stop_monitor");
 
-    write(1, "Monitor is shutting down...\n", 28);
+    kill(hub_monitor.monitor_pid, SIGTERM);
+
+    waitpid(hub_monitor.monitor_pid, NULL, 0);
+
+    hub_monitor.monitor_pid = -1;
+    hub_monitor.monitor_status = OFF;
+    write(1, "Monitor stopped.\n", 17);
+
+
+    //write(1, "Monitor is shutting down...\n", 28);
     return 1;
 }
 
@@ -155,5 +166,21 @@ int calculate_score(){
     }
 
     send_command_to_monitor("calculate_score");
+    return 1;
+}
+
+int calculate_score2(char* input){
+    if (!is_monitor_running()) {
+        write(1, "Monitor is not running.\n", 24);
+        return 0;
+    }
+
+    char *hunt_id = input + 16;
+    char command[BUFFER_SIZE];
+
+    snprintf(command, sizeof(command), "calculate_score %s", hunt_id);
+
+    send_command_to_monitor(command);
+    //send_command_to_monitor("calculate_score");
     return 1;
 }

@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     List_Score_T scores = calculate_all_scores(hunt_id);
 
     if (scores == NULL) {
-        write(2, "Failed to calculate scores\n", 28);
+        printf("Failed to calculate scores\n");
         return 1;
     }
 

@@ -7,6 +7,7 @@ void print_help(){
     write(1, "list_hunts\n", 12);
     write(1, "list_treasures\n", 16);
     write(1, "view_treasure\n", 14);
+    write(1, "calculate_score\n", 16);
     write(1, "help\n", 6);
     write(1, "clear\n", 7);
     write(1, "exit\n", 6);
@@ -37,7 +38,7 @@ Hub_Command_T get_command_type(char *input){
     else if(strcmp(input, "exit") == 0){
         return EXIT;
     }
-    else if(strcmp(input, "calculate_score") == 0){
+    else if(strncmp(input, "calculate_score ", 16) == 0){
         return CALCULATE_SCORE;
     }
     else {
@@ -70,16 +71,17 @@ void execute_command(Hub_Command_T command, char *input){
             break;
         case EXIT:
             if (is_monitor_running()) {
-                    write(1, "Error: monitor is still running. Stop it first.\n", 48);
+                    write(1, "Please stop the monitor before exiting.\n", 40);
                 }
             else{
                 exit(0);
             }
         case CALCULATE_SCORE:
-            calculate_score();
+            calculate_score2(input);
             break;
         default:
-            write(1, "Invalid command. Type 'help' for options.\n", 42);
+            printf("Invalid command. Type 'help' for a list of commands.\n");
+            break;
         
     }
 }

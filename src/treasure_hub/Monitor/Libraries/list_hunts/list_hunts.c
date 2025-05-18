@@ -21,7 +21,7 @@ void list_hunts() {
             struct stat st;
             if (stat(path, &st) == 0) {
                 int count = st.st_size / sizeof(struct Treasure);
-                dprintf(output_fd_pipe, "Hunt: %s | Treaures: %d\n", entry->d_name, count);
+                dprintf(output_fd_pipe, "Hunt: %s | Treasures: %d\n", entry->d_name, count);
             }
         }
     }

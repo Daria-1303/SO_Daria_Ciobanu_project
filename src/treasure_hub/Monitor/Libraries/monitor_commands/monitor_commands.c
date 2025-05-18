@@ -43,9 +43,11 @@ void exec_treasure_manager(char *command, char *hunt_id, char *treasure_id){
     char buffer[BUFFER_SIZE];
     ssize_t bytes_read;
 
-    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0){
+    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer))) > 0){
         // buffer[bytes_read] = '\0';
-        dprintf(output_fd_pipe, "%s", buffer);
+        //dprintf(output_fd_pipe, "%s", buffer);
+        // other command than dprintf
+        write(output_fd_pipe, buffer, bytes_read);
     }
 
     if(bytes_read < 0){
@@ -97,9 +99,9 @@ void exec_calculate_score(char *hunt_id){
     // read the output from the read end of the pipe
     char buffer[BUFFER_SIZE];
     ssize_t bytes_read;
-    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0){
+    while((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer))) > 0){
         // buffer[bytes_read] = '\0';
-        dprintf(output_fd_pipe, "%s", buffer);
+        write(output_fd_pipe, buffer, bytes_read);
     }
 
     if(bytes_read < 0){
@@ -142,7 +144,7 @@ void process_command(){
         exit(0);
     }
     else if(strcmp(buffer, "list_hunts") == 0) {
-        list_hunts();
+        list_hunts(); 
     }
     else if (strncmp(buffer, "list_treasures ", 15) == 0) {
       char hunt_id[10];
@@ -159,29 +161,34 @@ void process_command(){
             write(1, "Invalid format\n", 15);
         }
     }
-    else if(strcmp(buffer, "calculate_score") == 0){
+    else if(strncmp(buffer, "calculate_score ", 16) == 0){
         // the logic for finding every hunt of treasure_hunts folder
         // and then exec the calculator
-        DIR *dir = opendir(TREASURE_HUNTS_PATH);
+        // DIR *dir = opendir(TREASURE_HUNTS_PATH);
 
-        if(dir == NULL){
-            write(2, "Error opening directory\n", 22);
-            return;
-        }
+        // if(dir == NULL){
+        //     write(2, "Error opening directory\n", 22);
+        //     return;
+        // }
 
-        struct dirent *entry;
-        while((entry = readdir(dir)) != NULL){
-            if(entry->d_type == DT_DIR){
-                // skip the . and .. directories
-                if(strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0){
-                    char hunt_id[10];
-                    strcpy(hunt_id, entry->d_name);
-                    exec_calculate_score(hunt_id);
-                }
-            }
-        }
+        // struct dirent *entry;
+        // while((entry = readdir(dir)) != NULL){
+        //     if(entry->d_type == DT_DIR){
+        //         // skip the . and .. directories
+        //         if(strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0){
+        //             char hunt_id[10];
+        //             strcpy(hunt_id, entry->d_name);
+        //             exec_calculate_score(hunt_id);
+        //         }
+        //     }
+        // }
 
-        closedir(dir);      
+        // closedir(dir);   
+
+        // exec with the hunt id given as argument
+        char hunt_id[10];
+        sscanf(buffer, "calculate_score %s", hunt_id);
+        exec_calculate_score(hunt_id);
     }
     else{
         write(output_fd_pipe, "Monitor invalid command\n", 25);
