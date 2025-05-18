@@ -16,9 +16,12 @@
 #include <signal.h>
 #include <time.h>
 #include <sys/wait.h>
-
 #include <dirent.h>
 #include <sys/stat.h>
+
+// include treasure manager
+#include "../../treasure_manager/treasure_manager.h"
+
 
 // ---------------------------------------------------------
 // Defines
@@ -27,24 +30,5 @@
 #define TREASURE_MANAGER_EXEC  "bin/treasure_manager"
 
 #define BUFFER_SIZE 1024
-
-// ---------------------------------------------------------
-// Global Variables
-// ---------------------------------------------------------
-
-// global flag -> check if the program is running -> cleared when shutting down
-
-extern volatile sig_atomic_t is_running;
-
-
-// -----------------------------------------------------------
-// Functions
-// -----------------------------------------------------------
-
-void setup_signal_handlers();
-
-void process_command();
-
-
 
 #endif
